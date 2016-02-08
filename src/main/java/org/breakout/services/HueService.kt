@@ -5,66 +5,15 @@ import com.philips.lighting.hue.sdk.PHBridgeSearchManager
 import com.philips.lighting.hue.sdk.PHHueSDK
 import com.philips.lighting.hue.sdk.PHSDKListener
 import com.philips.lighting.model.PHBridge
-import com.philips.lighting.model.PHHueParsingError
 import com.philips.lighting.model.PHLight
-import com.philips.lighting.model.PHLightState
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 import java.util.*
 import javax.sound.sampled.AudioSystem
 import kotlin.concurrent.timerTask
 
-
-var username: String? = null
-var lastIpAddress: String? = null
-
-const val MAX_HUE = 65535
-
-class HueListener(val sdk: PHHueSDK) : PHSDKListener {
-
-    private val logger = LoggerFactory.getLogger(HueListener::class.java)
-
-    override fun onAccessPointsFound(accessPointsList: List<PHAccessPoint>) {
-        accessPointsList.forEach { list ->
-            logger.info("Found bridge with ID ${list.bridgeId} at ${list.ipAddress}")
-            logger.info("Push connect button to start")
-            sdk.startPushlinkAuthentication(list)
-        }
-    }
-
-    override fun onAuthenticationRequired(accessPoint: PHAccessPoint) {
-        sdk.startPushlinkAuthentication(accessPoint)
-        println("Push connect button on hue")
-    }
-
-    override fun onBridgeConnected(bridge: PHBridge, username: String) {
-        sdk.selectedBridge = bridge
-        sdk.enableHeartbeat(bridge, PHHueSDK.HB_INTERVAL.toLong())
-        lastIpAddress = bridge.resourceCache.bridgeConfiguration.ipAddress
-        logger.info("Connected to bridge")
-    }
-
-    override fun onCacheUpdated(arg0: List<Int>, arg1: PHBridge) {
-    }
-
-    override fun onConnectionLost(accessPoint: PHAccessPoint) {
-
-    }
-
-    override fun onConnectionResumed(arg0: PHBridge) {
-    }
-
-    override fun onError(code: Int, message: String) {
-        logger.error("Code $code: $message")
-    }
-
-    override fun onParsingErrors(parsingErrorsList: List<PHHueParsingError>) {
-        for (parsingError in parsingErrorsList) {
-            logger.error("ParsingError : " + parsingError.message)
-        }
-    }
-}
-
-class HueController {
+@Service
+class HueService {
 
     private val sdk: PHHueSDK
     private val listener: PHSDKListener
@@ -97,7 +46,7 @@ class HueController {
     private fun alertLightOn() {
         getAllLights().forEach { pair ->
             // A listener could be attached her, omitted for simplicity
-            pair.first.updateLightState(pair.second, Alarm)
+            pair.first.updateLightState(pair.second, LightState.Alarm)
         }
     }
 
@@ -116,23 +65,10 @@ class HueController {
     private fun alertLightOff() {
         getAllLights().forEach { pair ->
             // A listener could be attached her, omitted for simplicity
-            pair.first.updateLightState(pair.second, Off)
+            pair.first.updateLightState(pair.second, LightState.Off)
         }
     }
 
-    object Alarm : PHLightState() {
-        init {
-            this.isOn = true
-            this.hue = 0
-            this.brightness = 254
-        }
-    }
-
-    object Off : PHLightState() {
-        init {
-            this.isOn = false
-        }
-    }
 
     /**
      * Connect to the last known access point.

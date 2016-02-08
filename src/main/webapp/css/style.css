@@ -1,0 +1,50 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #073642;
+}
+
+.circle {
+    border-radius: 50%;
+    width: 50vw;
+    height: 50vw;
+
+    border: 1px solid black;
+
+    background-image: -moz-radial-gradient(45px 45px 45deg, circle cover, #ff4900 0%, #ff7600 100%, red 95%);
+    background-image: -webkit-radial-gradient(45px 45px, circle cover, #ff9b00, #ff4900);
+    background-image: radial-gradient(45px 45px 45deg, circle cover, #ff3900 0%, orange 100%, red 95%);
+}
+
+.circle:active {
+    animation-name: push;
+    animation-duration: 200ms;
+}
+
+.aligner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+#buzzerText {
+    font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+@keyframes push {
+
+    from {
+        box-shadow: none;
+    }
+
+    to {
+        -webkit-box-shadow: inset 0 0 69px -6px rgba(102, 0, 0, 1);
+        -moz-box-shadow: inset 0 0 69px -6px rgba(102, 0, 0, 1);
+        box-shadow: inset 0 0 69px -6px rgba(102, 0, 0, 1);
+    }
+}
